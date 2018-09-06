@@ -1,30 +1,35 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import logo from './logo.svg';
+import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import './App.css';
 import Login from './Login.js'
+import Search from './Search.js'
+import { readCookie } from './CookieUtils.js';
 
 class App extends Component {
   render() {
     return (
       <Router>
         <div>
-          <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/login">Login</Link>
-            </li>
-          </ul>
-
-          <hr />
-
-          <Route exact path="/" component={''} />
-          <Route path="/login" component={Login} />
+          <Route exact path="/" component={Login} />
+          <PrivateRoute path="/search" component={Search} />
         </div>
       </Router>
     );
+  }
+}
+
+const PrivateRoute = ({ component: Component, ...rest }) => (
+  <Route {...rest} render={(props) => (
+    isAuthenticated() == true
+      ? <Component {...props} />
+      : <Redirect to='/' />
+  )} />
+)
+
+function isAuthenticated() {
+  if (readCookie('isAuthenticated') == 'true') {
+    console.log('yes');
+    return true
   }
 }
 
